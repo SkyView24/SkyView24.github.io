@@ -24,9 +24,10 @@
 ## 📸 Preview
 
 <p align="center">
-  <img src="preview.png" alt="Preview 1" width="100%">
-  <img src="preview2.png" alt="Preview 2" width="50%">
-  <img src="preview3.png" alt="Preview 3" width="50%">
+  <img src="Hero_Dark.png" alt="Preview 1" width="100%">
+  <img src="Hero_Light.png" alt="Preview 1" width="100%">
+  <img src="Page_Dark.png" alt="Preview 2" width="50%">
+  <img src="Page_Light.png" alt="Preview 3" width="50%">
 </p>
 
 ---
