@@ -23,8 +23,8 @@
 <p align="center">
   <img src="Hero_Dark.jpg" alt="Preview 1" width="100%">
   <img src="Hero_Light.jpg" alt="Preview 1" width="100%">
-  <img src="Page_Dark.jpg" alt="Preview 2" width="50%">
-  <img src="Page_Light.jpg" alt="Preview 3" width="50%">
+  <img src="Page_Dark.jpg" alt="Preview 2" width="45%">
+  <img src="Page_Light.jpg" alt="Preview 3" width="45%">
 </p>
 
 ---
