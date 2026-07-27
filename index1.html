@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Premium Weather Application - Real-time weather forecasts, interactive maps, air quality data, and severe weather alerts. Beautiful, accurate, and fast.">
+    <meta name="keywords" content="weather, forecast, temperature, rain, snow, air quality, weather map, meteorology, climate, UV index, humidity, wind">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta property="og:title" content="SkyView Weather - Premium Weather App">
+    <meta property="og:description" content="Real-time weather forecasts with stunning visual effects. Get accurate weather data for any location worldwide.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SkyView Weather - Premium Weather App">
+    <meta name="twitter:description" content="Real-time weather forecasts with stunning visual effects.">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png">
+    
+    <!-- iOS meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SkyView">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <title>SkyView Weather — Premium Forecast</title>
+</head>
+<body>
+
+    <!-- Weather Effects Overlay -->
+    <div class="effects-overlay" id="effectsOverlay" aria-hidden="true"></div>
+
+    <!-- Lightning Flash Element -->
+    <div class="lightning-flash" id="lightningFlash" aria-hidden="true"></div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Attribution Toast (Bottom Left, Persistent) -->
+    <div class="attribution-toast" id="attributionToast" role="contentinfo" aria-label="Attribution information">
+        <div class="attribution-content">
+            <div class="attribution-text">
+                <strong> Developed By<a href="BilalBahij-dev"> Bilal Ahmad Bahij</a></strong>
+                <span class="attribution-divider">|</span>
+                <span>Weather data from <a href="https://openweathermap.org" target="_blank" rel="noopener noreferrer">OpenWeather</a> &amp; <a href="https://www.openstreetmap.org" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></span>
+            </div>
+            <button class="attribution-dismiss" id="attributionDismiss" aria-label="Dismiss attribution">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container" id="appContainer">
+        
+        <!-- Header -->
+        <header class="app-header" role="banner">
+            <div class="app-logo">
+                <i class="fa-solid fa-cloud-sun-rain" aria-hidden="true"></i>
+                <span>SkyView</span>
+            </div>
+            <div class="search-wrapper" role="search">
+                <label for="searchInput" class="sr-only">Search city</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search city, region, or country..."
+                autocomplete="off" aria-label="Search for a city" aria-expanded="false" aria-controls="suggestionsList">
+                <button class="search-btn" id="searchBtn" aria-label="Search">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </button>
+                <ul class="search-suggestions" id="suggestionsList" role="listbox" aria-label="Search suggestions"></ul>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="gpsBtn" aria-label="Detect my location" title="Use my location">
+                    <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                </button>
+                <button class="icon-btn" id="favBtn" aria-label="Saved locations" title="Favorites">
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    <span class="badge hidden" id="favBadge">0</span>
+                </button>
+                <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Theme">
+                    <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
+                </button>
+                <button class="icon-btn" id="unitBtn" aria-label="Toggle temperature unit" title="Unit">
+                    <span class="unit-label">°C</span>
+                </button>
+                <button class="icon-btn" id="refreshBtn" aria-label="Refresh weather data" title="Refresh">
+                    <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Current Weather Hero -->
+        <section class="glass-card weather-hero" id="weatherHero" aria-label="Current weather">
+            <div class="weather-hero-left">
+                <div class="location-name" id="locationName">--</div>
+                <div class="text-sm text-tertiary" id="locationDetails">Search a city or enable GPS</div>
+                <div class="temp-display">
+                    <span id="currentTemp">--</span><span class="degree">°</span>
+                </div>
+                <div class="condition-text" id="conditionText">--</div>
+                <div class="feels-like" id="feelsLike">Feels like --</div>
+                <div class="hi-lo" id="hiLo">
+                    <span><i class="fa-solid fa-arrow-up text-accent" aria-hidden="true"></i> --°</span>
+                    <span><i class="fa-solid fa-arrow-down text-accent" aria-hidden="true"></i> --°</span>
+                </div>
+            </div>
+            <div class="weather-hero-right">
+                <div class="weather-icon-large" id="weatherIconLarge" aria-hidden="true">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                </div>
+                <div id="sunTimes" class="text-sm">🌅 -- &nbsp; 🌇 --</div>
+            </div>
+        </section>
+
+        <!-- Weather Details Grid -->
+        <section class="glass-card" aria-label="Weather details">
+            <div class="details-grid" id="detailsGrid"></div>
+        </section>
+
+        <!-- Hourly Forecast -->
+        <section class="glass-card" aria-label="Hourly forecast">
+            <h4 class="section-title"><i class="fa-solid fa-clock text-accent" aria-hidden="true"></i> Hourly Forecast</h4>
+            <div class="hourly-strip" id="hourlyStrip"></div>
+        </section>
+
+        <!-- 7-Day Forecast & Chart -->
+        <div class="two-column-grid">
+            <section class="glass-card" aria-label="7-day forecast">
+                <h4 class="section-title"><i class="fa-solid fa-calendar-week text-accent" aria-hidden="true"></i> 7-Day Forecast</h4>
+                <div id="dailyForecast"></div>
+            </section>
+            <section class="glass-card" aria-label="Temperature chart">
+                <h4 class="section-title"><i class="fa-solid fa-chart-line text-accent" aria-hidden="true"></i> Temperature Trend</h4>
+                <canvas class="chart-canvas" id="tempChart" aria-label="Temperature chart for upcoming days"></canvas>
+            </section>
+        </div>
+
+        <!-- Air Quality & Map -->
+        <div class="two-column-grid">
+            <section class="glass-card" aria-label="Air quality index">
+                <h4 class="section-title"><i class="fa-solid fa-wind text-accent" aria-hidden="true"></i> Air Quality</h4>
+                <div class="aqi-display" id="aqiDisplay"></div>
+            </section>
+            <section class="glass-card map-section" aria-label="Weather map">
+                <h4 class="section-title"><i class="fa-solid fa-map text-accent" aria-hidden="true"></i> Weather Map</h4>
+                <div class="map-container" id="mapContainer">
+                    <div class="map-layer-btns" id="mapLayerBtns">
+                        <button data-layer="temp_new" class="active">Temp</button>
+                        <button data-layer="precipitation_new">Rain</button>
+                        <button data-layer="wind_new">Wind</button>
+                        <button data-layer="clouds_new">Clouds</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Favorites & Recent -->
+        <section class="glass-card" aria-label="Saved and recent locations">
+            <div class="favorites-header">
+                <h4 class="section-title"><i class="fa-solid fa-star text-accent" aria-hidden="true"></i> Saved & Recent</h4>
+                <span class="text-xs hint-text">Click to load &bull; Click ✕ to remove</span>
+            </div>
+            <div class="chip-list" id="favoritesList">
+                <span class="placeholder-text">No saved locations yet. Star a city to save it.</span>
+            </div>
+            <div class="chip-list" id="recentList"></div>
+        </section>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay hidden" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal" id="modalContent">
+            <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+            <h3 id="modalTitle">Settings</h3>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="script.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered:', reg.scope))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
